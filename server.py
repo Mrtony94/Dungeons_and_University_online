@@ -5,7 +5,6 @@ Javier Zapatero Lera DNI: 54300753F Titulación: IST
 Hemos realizado el programa con implementación de color (solo compatible con distribuciones UNIX o macOS)
 """
 
-
 import getopt
 import os
 import signal
@@ -13,10 +12,8 @@ import socket
 import sys
 from threading import Thread
 
-import game
 import protocols
 from game import Game
-
 
 id = 1
 games = {}
@@ -125,10 +122,10 @@ class ClientHandler(Thread):
 
     def send_welcome(self):
         msg = {'header': protocols.WELCOME, 'menu': ClientHandler.menu(), 'options_range': [1, 2, 3, 4]}
-        protocols.send_one_msg(self.client_socket, msg)  # envia el mensaje al cliente
+        protocols.send_one_msg(self.client_socket, msg)
 
-    def send_load_game_answer(self, success, answer):
-        msg = {'header': protocols.LOAD_GAME_ANSWER, 'success': success, 'answer': answer}
+    def send_load_game_answer(self, valid, message):
+        msg = {'header': protocols.LOAD_GAME_ANSWER, 'valid': valid, 'message': message}
         protocols.send_one_msg(self.client_socket, msg)
 
     def send_choose_character(self):
@@ -148,7 +145,7 @@ class ClientHandler(Thread):
         protocols.send_one_msg(self.client_socket, msg)
 
     def send_dc_server(self):
-        msg = {'header': protocols.DC_SERVER, 'answer': "You have been disconnected"}
+        msg = {'header': protocols.DC_SERVER, 'reason': "You have been disconnected"}
         protocols.send_one_msg(self.client_socket, msg)
         self.client_socket.close()
 
@@ -159,15 +156,16 @@ class ClientHandler(Thread):
         for player in self.game.all_players():
             protocols.send_one_msg(player['client_socket'], msg)
             # eliminar los clientes de la lista de clientes
-            del clients[self.player['client_address']]
+            if clients[player['client_address']]:
+                del clients[self.player['client_address']]
             # eliminar la partida de la lista de partidas
         if self.game.id in games:
             del games[self.game.id]
         self.end = True
 
     def send_your_turn(self, player):
-        message = f"{self.player['character'].name()}. What do you want to do?"
-        options_range = ["a", "g"]
+        message = f"{self.player['character'].name()}: What do you want to do? >>"
+        options_range = ["a", "s"]
         msg = {'header': protocols.YOUR_TURN, 'message': message, 'options_range': options_range}
         protocols.send_one_msg(player['client_socket'], msg)
 
@@ -193,8 +191,8 @@ class ClientHandler(Thread):
                 clients[self.client_address] = self.game.id  # agrega él, id del juego a la lista de clientes
                 self.player = self.game.player_in_turn()  # obtiene el jugador que tiene el turno
                 self.player['name'] = self.name
-                self.player['client'] = self.client_socket
-                self.player['address'] = self.client_address
+                self.player['client_socket'] = self.client_socket
+                self.player['client_address'] = self.client_address
                 self.game.creator = self.name
                 self.game.n_players = 1
                 self.send_load_game_answer(True,
@@ -204,14 +202,11 @@ class ClientHandler(Thread):
                 self.send_load_game_answer(False, "The file was not found ")
 
     def handle_server_option(self, msg):
-        # storage in variables the part of message less the header, if the client selected the option 1, write in the
-        # terminal the message "(CREATE="
         option = msg['option']
         stages = msg['stages']
         if option == 1:
             global id, games, clients
             print(f"(CREATE) {self.name} has created a new game")
-            # crea un nuevo juego pasandole el id, el nombre del jugador
             self.game = Game(id, self.name, stages)  # crea el juego esta bien javi?
             games[id] = self.game  # agrega el juego a la lista de juegos
             clients[self.client_address] = id  # agrega él, id del juego a la lista de clientes
@@ -223,22 +218,34 @@ class ClientHandler(Thread):
             pass  # Cargar partida de un fichero
         else:
             print(f"(EXIT) {self.name} disconnected")
-            self.send_dc_server()  # mirar esto de donde sale!!!!!!!
+            self.send_dc_server()
             self.end = True
 
     def handle_character(self, msg):
-        character = msg['option']
-        self.player = self.game.add_player(character, self.name, self.client_socket, self.client_address)
+        global clients, games
+        option = msg['option']
+
+        self.player = self.game.add_player(option, self.name, self.client_socket, self.client_address)
+
+        # self.name = clients['client_socket']
+        # self.game_id = games['client_address']
+        # self.game = games[self.game_id]
         print(self.game.can_join())
-        if self.game.can_join:
+        if self.game.can_join():
             print(f"(START) {self.name} has started the game")
-            ClientHandler.send_server_msg_to_all("Texto a enviarle stages, jugadores.....", self.game.players_list)  # como se hace la parte de tecto de la info? llamamos la info de game.py?
+            ClientHandler.send_server_msg_to_all(f"{self.game.print_stage()}{self.game.print_enemies()}",
+                                                 self.game.all_players())  # como se hace la parte de tecto de la info? llamamos la info de game.py?
+            ClientHandler.send_server_msg_to_all(
+                f"A game with {self.game.stages} stage(s) will be set up for {self.game.PLAYERS} players.\n",
+                self.game.all_players())
+
             # sacamos el turno del jugador y lo enviamos como se hace esto?
             player = self.game.player_in_turn()
             # self.current_player = self.game.player_turn
             self.send_your_turn(player)
         else:
-            ClientHandler.send_server_msg_to_one("We have wait the other gamers", self.player['client_socket'])
+            ClientHandler.send_server_msg_to_one("Waiting for other players to join the game",
+                                                 self.player['client_socket'])
 
     def handle_character_command(self, msg):
         global result, file
@@ -254,14 +261,12 @@ class ClientHandler(Thread):
                 result = self.game.player_execute_command(self.player, command, file)
                 ClientHandler.send_server_msg_to_one(result, self.player['client_socket'])
                 player = self.game.player_in_turn()  # el jugador que le toca el turno
-                # Enviar un mensaje your_turn al jugador que le toca el turno
-                # Cual tendriamos que usar?
                 self.send_your_turn(player)
         else:
             result = self.game.player_execute_command(self.player, command)
             ClientHandler.send_server_msg_to_all(result, self.game.all_players())
         # si la partida ha terminado
-        if self.game.is_over():
+        if self.game.finish_game():
             # enviar un mensaje a todos los clientes de la partida con el mensaje (END_GAME) a todos los jugadores
             self.send_end_game()
         else:
@@ -273,40 +278,33 @@ class ClientHandler(Thread):
     def handle_game_choice(self, msg):
         global games
         option = msg['option']
-        # games_for_join = ClientHandler.games_for_join()
-        # if 1 <= option <= len(games_for_join):
         if option in games:
             game = games[option]
-            if game.can_join:
+            if game.can_join():
+                self.send_valid_game(False)
+            else:
                 global clients
                 self.game = game
                 clients[self.client_address] = self.game.id
-                print(f"(JOIN).....")
-                self.send_valid_game(True)  # enviar a true
-                # si la partida se carga desde un fichero
-                if game.from_file:  # ¿esto seria asi?
-                    self.player = self.game.another_character()  # el jugador que se mete es el otro
-                    # asignas valor a las  claves name, client, y address del self.player
+                print(f"(JOIN) {self.name} joined {game.creator}'s game")
+                self.send_valid_game(True)
+                if game.from_file:
+                    self.player = self.game.another_character()
                     self.player['name'] = self.player['name']
                     self.player['client_socket'] = self.player['client_socket']
                     self.player['client_address'] = self.player['client_address']
                     self.game.n_players += 1
-                    # self.game.add_player(self.player, character)
-                    # enviar un mensaje server
-                    self.send_server_msg_to_one(f"{self.player['name']} has joined the game", self.player['client_socket'])
-                    print(f"(START).....")
-                    # extraer el jugador al que le toca el turno y enviarle un mensaje con el mensaje (SERVER) a
-                    player = self.game.player_in_turn()  # el jugador que le toca el turno
-                    # todos los jugadores con la información de la partida
-                    self.send_server_msg_to_all(f"{self.player['name']} has joined the game", self.game.all_players())
-                    # Enviar un mensaje your_turn al jugador que le toca el turno
+                    self.send_server_msg_to_one(f"{self.player['name']} has joined the game",
+                                                self.player['client_socket'])
+                    print(f"(START) {game.players_names()} continued a game")
+
+                    player = self.game.player_in_turn()
+                    ClientHandler.send_server_msg_to_all(player, game.all_players())
                     self.send_your_turn(player)
                 else:
-                    # enviar un mensaje choose_character al cliente
                     self.send_choose_character()
-            else:
-                print(f"Entro por el False, recibo -> {game.can_join()}, está llena, salgo de la partida")
-                self.send_valid_game(False)
+        else:
+            self.send_valid_game(False)
 
     def handle_dc_me(self):
         global clients, games
@@ -318,10 +316,12 @@ class ClientHandler(Thread):
                     print(f"(DC) {self.name} was disconnected.")
                     protocols.send_one_msg(player['client_socket'], msg)
                     # borrar al cliente del diccionario de clientes
+                    # self.player['client_socket'].close()
                     del clients[player['client_address']]
+
             # borrar la partida del diccionario de partidas
-            del games[self.game['name']]
-            print(f"{self.name} was disconnected from {self.game['name']} game.")
+            del games[self.game.id] # Mal
+            print(f"{self.name} was disconnected from {self.game.id} game.")
             # borrar al cliente actual del diccionario de clientes
             del clients[self.player['client_address']]
             self.end = True

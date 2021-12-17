@@ -77,7 +77,7 @@ class Client:
         while not valid:
             print(text, end="")
             try:
-                option = int(input("your option: "))
+                option = int(input("Choose your option >> "))
                 if option in option_range:
                     valid = True
                 else:
@@ -123,32 +123,26 @@ class Client:
     # --------------------------------------------------------------------------------------------- #
 
     def send_load_game(self, file_name):
-        # como cualquier send, se envia el header y el nombre del archivo
         msg = {'header': protocols.LOAD_GAME, 'file_name': file_name}
         protocols.send_one_msg(self.socket, msg)
 
     def send_server_option(self, option):
-        # como cualquier send, se envia el header y opcion y stages
         msg = {'header': protocols.SERVER_OPTION, 'option': option, 'stages': self.stages}
         protocols.send_one_msg(self.socket, msg)
 
     def send_character(self, option):
-        # como cualquier send
         msg = {'header': protocols.CHARACTER, 'option': option}
         protocols.send_one_msg(self.socket, msg)
 
     def send_game_choice(self, option):
-        # como cualquier send
         msg = {'header': protocols.GAMES_CHOICE, 'option': option}
         protocols.send_one_msg(self.socket, msg)
 
     def send_dc_me_msg(self):
-        # como cualquier send
         msg = {'header': protocols.DC_ME}
         protocols.send_one_msg(self.socket, msg)
 
     def send_character_command(self, command, file_name=None):
-        # como cualquier send
         msg = {'header': protocols.CHARACTER_COMMAND, 'command': command, 'file_name': file_name}
         protocols.send_one_msg(self.socket, msg)
 
@@ -183,29 +177,29 @@ class Client:
     def handle_valid_game(self, msg):
         joined = msg['joined']
         if not joined:
-            print("The Game is not valid...")
+            print("Game is not valid. Bye!")
             self.end = True
 
     def handle_end_game(self, msg):
         win = msg['win']
         if win:
-            print("All stages.....")
+            print("All the stages haven been cleared. You won the game!")
         else:
-            print("all characters...")
+            print("All characters have been defeated. Try again")
         self.end = True
 
     def handle_dc_server(self, msg):
-        reason = msg['answer']
+        reason = msg['reason']
         print(reason)
         self.end = True
 
     def handle_load_game_answer(self, msg):
         valid = msg['valid']
-        answer = msg['answer']
+        message = msg['message']
         if valid:
-            print(answer)
+            print(valid)
         else:
-            print(answer, end="")
+            print(message, end="")
             file_name = input("Try again: ")
             self.send_load_game(file_name)
 
@@ -248,12 +242,12 @@ class Client:
             try:
                 msg = protocols.receive_one_msg(self.socket)
                 self.handle_msg(msg)
-            except protocols.InvalidProtocol as e:
-                print(e)
             except KeyboardInterrupt:
                 self.send_dc_me_msg()
+                self.end = True
             except protocols.ConnectionClosed as e:
                 print(e)
+                self.end = True
         self.socket.close()
 
 
@@ -274,5 +268,3 @@ except getopt.GetoptError:
     print("Invalid arguments")
 except (ConnectionRefusedError, TimeoutError) as err:
     print(f"Could not connect to the server. Are you sure you have provided the correct ip and port?")
-except KeyboardInterrupt:
-    pass
