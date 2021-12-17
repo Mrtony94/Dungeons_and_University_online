@@ -77,7 +77,7 @@ class Client:
         while not valid:
             print(text, end="")
             try:
-                option = int(input("Choose your option >> "))
+                option = int(input("\nChoose your option >> "))
                 if option in option_range:
                     valid = True
                 else:

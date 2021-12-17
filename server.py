@@ -90,11 +90,16 @@ class ClientHandler(Thread):
 
     @staticmethod
     def menu():
-        menu = """Welcome to the server! Choose one of this options:
+        menu = """
+Welcome to the server! Choose one of this options:
+
+MENU:       
+
 1.- Create new game
 2.- Join game
 3.- Load game
-4.- Exit\n"""
+4.- Exit
+"""
         return menu
 
     @staticmethod
@@ -244,7 +249,7 @@ class ClientHandler(Thread):
             # self.current_player = self.game.player_turn
             self.send_your_turn(player)
         else:
-            ClientHandler.send_server_msg_to_one("Waiting for other players to join the game",
+            ClientHandler.send_server_msg_to_one("\nWaiting for other players to join the game",
                                                  self.player['client_socket'])
 
     def handle_character_command(self, msg):
@@ -266,14 +271,14 @@ class ClientHandler(Thread):
             result = self.game.player_execute_command(self.player, command)
             ClientHandler.send_server_msg_to_all(result, self.game.all_players())
         # si la partida ha terminado
-        if self.game.finish_game():
-            # enviar un mensaje a todos los clientes de la partida con el mensaje (END_GAME) a todos los jugadores
-            self.send_end_game()
-        else:
-            # extraer el jugador al que le toca el turno y enviarle un mensaje con el mensaje (YOUR_TURN)
-            player = self.game.player_in_turn()  # el jugador que le toca el turno
-            # Enviar un mensaje your_turn al jugador que le toca el turno
-            self.send_your_turn(player)
+            if self.game.finish_game():
+                # enviar un mensaje a todos los clientes de la partida con el mensaje (END_GAME) a todos los jugadores
+                self.send_end_game()
+            else:
+                # extraer el jugador al que le toca el turno y enviarle un mensaje con el mensaje (YOUR_TURN)
+                player = self.game.player_in_turn()  # el jugador que le toca el turno
+                # Enviar un mensaje your_turn al jugador que le toca el turno
+                self.send_your_turn(player)
 
     def handle_game_choice(self, msg):
         global games

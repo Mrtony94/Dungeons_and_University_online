@@ -47,7 +47,7 @@ class Game:
 
     @staticmethod
     def print_available_characters():
-        result = f"{Bcolors.CHARACTER}************      AVAILABLE CHARACTERS      ************\n"
+        result = f"\n{Bcolors.CHARACTER}************      AVAILABLE CHARACTERS      ************\n"
         for index, character_class in enumerate(Game.AVAILABLE_CHARACTERS):
             result += f"{index + 1}.- "
             result += str(character_class.print_info())
@@ -154,6 +154,7 @@ class Game:
         if command == "a":
             result += self.enemies_random_attack(player)  # player attacks enemy
             if len(self.enemies_list) == 0:
+                result += f"current stages -->{self.current_stage} stages -->{self.stages}"
                 if self.current_stage == self.stages:
                     self.end_game = True
                 else:
@@ -190,19 +191,21 @@ class Game:
                     valid_enemy = True
 
     def enemies_random_attack(self, player):  # player no character
+
+        name = player['name']
         result = f"{Bcolors.MONSTER}\n     -----------------------\n"\
-                 f"     -    PLAYERS TURN {self.player_turn + 1}   -\n"\
+                 f"     -    {name.upper()}'s TURN    -\n"\
                  "     -----------------------\n"
         character = player['character']
         enemy = random.choice(self.enemies_list)
         dmg_attack = character.attack(enemy)  # El jugador ataca al enemigo
         if enemy.hp == 0:
             self.enemies_list.remove(enemy)
-            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} (Player {self.player_turn + 1}) "\
+            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} ({name}) "\
                      f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. "\
                      f"{enemy.__class__.__name__} {Bcolors.RESET}dead\n"
         else:
-            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} (Player {self.player_turn + 1}) "\
+            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} ({name}) "\
                      f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. "\
                      f"{enemy.__class__.__name__} {Bcolors.RESET}has {enemy.hp} hp left\n"
         return result
@@ -213,16 +216,16 @@ class Game:
                  "     -----------------------\n"
         for enemy in self.enemies_list:
             player = random.choice(self.players_list)
-            # name = player['name']
+            name = player['name']
             character = player['character']
             dmg_attack = enemy.attack(character)
             if character.hp > 0:
                 result += f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to "\
-                         f"{Bcolors.CHARACTER}{character.__class__.__name__} (Player {self.player_turn + 1})."\
+                         f"{Bcolors.CHARACTER}{character.__class__.__name__} ({name})."\
                          f" {character.__class__.__name__} {Bcolors.RESET} has {character.hp} hp left\n"
             else:
                 result += f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to "\
-                         f"{Bcolors.CHARACTER}{character.__class__.__name__} (Player {self.player_turn + 1}). "\
+                         f"{Bcolors.CHARACTER}{character.__class__.__name__} ({name}). "\
                          f" {character.__class__.__name__} {Bcolors.RESET}left the game\n"
                 self.dead_players.append(player)  # se añade al jugador muerto a la lista de muertos
                 self.players_list.remove(player)  # se elimina al jugador de la lista de jugadores
