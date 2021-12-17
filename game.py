@@ -76,6 +76,8 @@ class Game:
     # --------------------------------------------------------------------------------------------- #
     # EXTRA DEF
     # --------------------------------------------------------------------------------------------- #
+    def finish_game(self):
+        return self.end_game
 
     def info(self):
         return f"Player: {self.n_players} / {Game.PLAYERS}\n"
@@ -103,9 +105,10 @@ class Game:
     # --------------------------------------------------------------------------------------------- #
 
     def print_stage(self):
-        result = f"{Bcolors.STAGE}\n      ***********************\n"
-        result += f"      *       STAGE {self.current_stage}       *\n"
-        result += f"      ***********************\n"
+        result = f"{Bcolors.STAGE}\n      ***********************\n"\
+                 f"      *       STAGE {self.current_stage}       *\n"\
+                 f"      ***********************\n" \
+                 f"\n"
         return result
 
     def print_characters_selection(self):
@@ -116,19 +119,11 @@ class Game:
         return result
 
     def print_enemies(self):
-        result = f"{Bcolors.MONSTER}     ---- CURRENT MONSTER ----\n"
-        result += f"+++++++++++++++++++++++++++++++++++++++++\n"
+        result = f"{Bcolors.MONSTER}     ---- CURRENT MONSTER ----\n"\
+                 f"+++++++++++++++++++++++++++++++++++++++++\n"
         for enemy in self.enemies_list:
             result += enemy.display_attributes()
         result += """+++++++++++++++++++++++++++++++++++++++++
-
-               .             
-
-               .             
-
-               .             
-
-               .
 
 """
         return result
@@ -169,8 +164,8 @@ class Game:
                     self.enemies_generate()
                     result += self.print_stage()
             else:
-                if self.player_turn == 1:  # mirar porque ni idea último jugador al que le toca el turno
-                    result += self.enemies_turn
+                if self.player_turn == 1:
+                    result += self.play_enemies_turn()
                     if len(self.players_list) != 0:  # si aún hay jugadores vivos
                         # poner la posición del turno a 0
                         self.player_turn = 0
@@ -194,35 +189,41 @@ class Game:
                     self.enemies_list.append(enemy_class(self.current_stage))
                     valid_enemy = True
 
-    def enemies_random_attack(self, character):
+    def enemies_random_attack(self, player):  # player no character
+        result = f"{Bcolors.MONSTER}\n     -----------------------\n"\
+                 f"     -    PLAYERS TURN {self.player_turn + 1}   -\n"\
+                 "     -----------------------\n"
+        character = player['character']
         enemy = random.choice(self.enemies_list)
         dmg_attack = character.attack(enemy)  # El jugador ataca al enemigo
         if enemy.hp == 0:
             self.enemies_list.remove(enemy)
-            result = f"{Bcolors.CHARACTER}The {character.__class__.__name__} (Player {self.player_turn + 1})\n"
-            result += f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}.\n"
-            result += f"{enemy.__class__.__name__} {Bcolors.RESET}dead "
+            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} (Player {self.player_turn + 1}) "\
+                     f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. "\
+                     f"{enemy.__class__.__name__} {Bcolors.RESET}dead\n"
         else:
-            result = f"{Bcolors.CHARACTER}The {character.__class__.__name__} (Player {self.player_turn + 1})\n"
-            result += f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}.\n"
-            result += f"{enemy.__class__.__name__} {Bcolors.RESET}has {enemy.hp} hp left\n"
+            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} (Player {self.player_turn + 1}) "\
+                     f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. "\
+                     f"{enemy.__class__.__name__} {Bcolors.RESET}has {enemy.hp} hp left\n"
         return result
 
     def play_enemies_turn(self):
-        result = f"{Bcolors.MONSTER}\n     -----------------------\n"
-        result += "     -    MONSTERS TURN    -\n"
-        result += "     -----------------------\n"
+        result = f"{Bcolors.MONSTER}\n     -----------------------\n"\
+                 "     -    MONSTERS TURN    -\n"\
+                 "     -----------------------\n"
         for enemy in self.enemies_list:
             player = random.choice(self.players_list)
-            dmg_attack = enemy.attack(player)
-            if player.hp > 0:
-                result = f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to \n"
-                result += f"{Bcolors.CHARACTER}{player.__class__.__name__} (Player {self.player_turn + 1}).\n"
-                result += f" {player.__class__.__name__} {Bcolors.RESET} has {player.hp} hp left\n"
+            # name = player['name']
+            character = player['character']
+            dmg_attack = enemy.attack(character)
+            if character.hp > 0:
+                result += f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to "\
+                         f"{Bcolors.CHARACTER}{character.__class__.__name__} (Player {self.player_turn + 1})."\
+                         f" {character.__class__.__name__} {Bcolors.RESET} has {character.hp} hp left\n"
             else:
-                result = f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to \n"
-                result += f"{Bcolors.CHARACTER}{player.__class__.__name__} (Player {self.player_turn + 1}).\n"
-                result += f" {player.__class__.__name__} {Bcolors.RESET}left the game\n"
+                result += f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to "\
+                         f"{Bcolors.CHARACTER}{character.__class__.__name__} (Player {self.player_turn + 1}). "\
+                         f" {character.__class__.__name__} {Bcolors.RESET}left the game\n"
                 self.dead_players.append(player)  # se añade al jugador muerto a la lista de muertos
                 self.players_list.remove(player)  # se elimina al jugador de la lista de jugadores
             if len(self.players_list) == 0:
@@ -270,47 +271,35 @@ class Game:
     # --------------------------------------------------------------------------------------------- #
 
     def save_file(self, file):
-        global player_info, result
-        global enemy_info
-        import json
-
-        correct = False
+        global player
         try:
-            file = input("Where do you want the save the game (the file name must end with .txt or .json): ")
-            while not correct:
-                if file == "cancel":
-                    result = "The game was not saved."
-                    correct = True
-                elif file.endswith(".txt") or file.endswith(".json"):
-                    game_info = {'stages': self.stages, 'current_stage': self.current_stage,
-                                 'player_turn': self.player_turn}
+            game_info = {'stages': self.stages, 'current_stage': self.current_stage,
+                         'player_turn': self.player_turn}
 
-                    players_list = []
-                    enemies_list = []
-                    dead_players = []
+            players_list = []
+            enemies_list = []
+            dead_players = []
 
-                    for player in self.players_list:
-                        player_info = {'class': player.__class__.__name__, 'hp': player.hp}
-                        players_list.append(player_info)
-                    game_info['players_list'] = players_list
+            for player in self.players_list:
+                character = player['character']
+                player_info = {'class': character.__class__.__name__, 'hp': character.hp}
+                players_list.append(player_info)
+            game_info['players_list'] = players_list
 
-                    for enemy in self.enemies_list:
-                        enemy_info = {'class': enemy.__class__.__name__, 'hp': enemy.hp}
-                        enemies_list.append(enemy_info)
-                    game_info['enemies_list'] = enemies_list
+            for enemy in self.enemies_list:
+                enemy_info = {'class': enemy.__class__.__name__, 'hp': enemy.hp}
+                enemies_list.append(enemy_info)
+            game_info['enemies_list'] = enemies_list
 
-                    for player_dead in self.dead_players:
-                        player_dead_info = {'class': player_dead.__class__.__name__, 'hp': player_dead.hp}
-                        dead_players.append(player_dead_info)
-                    game_info['dead_players'] = dead_players
+            for player_dead in self.dead_players:
+                character = player['character']
+                player_dead_info = {'class': character.__class__.__name__, 'hp': character.hp}
+                dead_players.append(player_dead_info)
+            game_info['dead_players'] = dead_players
 
-                    with open(file, 'w') as f:
-                        f.write(json.dumps(game_info))
-                    correct = True
-                    result = "The game has been saved!!\n"
-                else:
-                    file = input("The format of the file name is incorrect (the file name must end with .txt or "
-                                 ".json). Try again: ")
+            with open(file, 'w') as f:
+                f.write(json.dumps(game_info))
+            result = "The game has been saved!!\n"
         except FileNotFoundError:
             result = "The file was not found."
         return result
