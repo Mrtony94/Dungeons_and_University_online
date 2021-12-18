@@ -144,7 +144,9 @@ MENU:
 **********************\n"""
         else:
             menu = """**********************
-There are not GAMES\n"""
+There are not GAMES
+**********************
+"""
             self.send_server_msg_to_one(menu, self.client_socket)
             self.send_dc_server()
 
