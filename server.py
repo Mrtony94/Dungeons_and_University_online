@@ -11,6 +11,7 @@ import signal
 import socket
 import sys
 from threading import Thread
+import errno
 
 import protocols
 from game import Game
@@ -177,7 +178,7 @@ There are not GAMES
         self.end = True
 
     def send_your_turn(self, player):
-        message = f"{self.player['character'].name()}: What do you want to do? >> "
+        message = f"The {player['character'].name()} (Player {self.game.player_turn + 1}): What are you going to do? >> "
         options_range = ["a", "s"]
         msg = {'header': protocols.YOUR_TURN, 'message': message, 'options_range': options_range}
         protocols.send_one_msg(player['client_socket'], msg)
@@ -262,6 +263,11 @@ There are not GAMES
                     self.player['client_socket'])
             else:
                 file = os.path.join(ClientHandler.FILE_DIRECTORY, file_name)
+                try:
+                    os.mkdir(ClientHandler.FILE_DIRECTORY)
+                except OSError as e:
+                    if e.errno != errno.EEXIST:
+                        raise
                 result = self.game.player_execute_command(self.player, command, file)
                 ClientHandler.send_server_msg_to_one(result, self.player['client_socket'])
                 player = self.game.player_in_turn()
