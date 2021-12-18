@@ -146,7 +146,10 @@ MENU:
             menu = """**********************
 There are not GAMES\n"""
             self.send_server_msg_to_one(menu, self.client_socket)
-            self.send_dc_server()
+            try:
+                self.send_dc_server()
+            except OSError:
+                pass
 
         option_range = []
         for game in games.values():  # partidas que no están llenas
