@@ -44,6 +44,9 @@ class Character:
         result = f"{self.__class__.__name__}: Stats: {self.hp} HP and {self.dmg} DMG"
         return result
 
+    def info_player(self):
+        return {'class': self.__class__.__name__, 'hp': self.hp}
+
     def name(self):
         return self.__class__.__name__
 

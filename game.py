@@ -106,8 +106,8 @@ class Game:
     # --------------------------------------------------------------------------------------------- #
 
     def print_stage(self):
-        result = f"{Bcolors.STAGE}\n      ***********************\n"\
-                 f"      *       STAGE {self.current_stage}       *\n"\
+        result = f"{Bcolors.STAGE}\n      ***********************\n" \
+                 f"      *       STAGE {self.current_stage}       *\n" \
                  f"      ***********************\n" \
                  f"\n"
         return result
@@ -120,7 +120,7 @@ class Game:
         return result
 
     def print_enemies(self):
-        result = f"{Bcolors.MONSTER}     ---- CURRENT MONSTER ----\n"\
+        result = f"{Bcolors.MONSTER}     ---- CURRENT MONSTER ----\n" \
                  f"+++++++++++++++++++++++++++++++++++++++++\n"
         for enemy in self.enemies_list:
             result += enemy.display_attributes()
@@ -193,26 +193,26 @@ class Game:
     def enemies_random_attack(self, player):
 
         name = player['name']
-        result = f"{Bcolors.MONSTER}\n     -----------------------\n"\
-                 f"     -    {name.upper()}'s TURN    -\n"\
+        result = f"{Bcolors.MONSTER}\n     -----------------------\n" \
+                 f"     -    {name.upper()}'s TURN    -\n" \
                  "     -----------------------\n"
         character = player['character']
         enemy = random.choice(self.enemies_list)
         dmg_attack = character.attack(enemy)  # El jugador ataca al enemigo
         if enemy.hp == 0:
             self.enemies_list.remove(enemy)
-            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} ({name}) "\
-                      f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. "\
+            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} ({name}) " \
+                      f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. " \
                       f"{enemy.__class__.__name__} {Bcolors.RESET}dead\n"
         else:
-            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} ({name}) "\
-                      f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. "\
+            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} ({name}) " \
+                      f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. " \
                       f"{enemy.__class__.__name__} {Bcolors.RESET}has {enemy.hp} hp left\n"
         return result
 
     def play_enemies_turn(self):
-        result = f"{Bcolors.MONSTER}\n     -----------------------\n"\
-                 "     -    MONSTERS TURN    -\n"\
+        result = f"{Bcolors.MONSTER}\n     -----------------------\n" \
+                 "     -    MONSTERS TURN    -\n" \
                  "     -----------------------\n"
         for enemy in self.enemies_list:
             player = random.choice(self.players_list)
@@ -220,12 +220,12 @@ class Game:
             character = player['character']
             dmg_attack = enemy.attack(character)
             if character.hp > 0:
-                result += f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to "\
-                          f"{Bcolors.CHARACTER}{character.__class__.__name__} ({name})."\
+                result += f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to " \
+                          f"{Bcolors.CHARACTER}{character.__class__.__name__} ({name})." \
                           f" {character.__class__.__name__} {Bcolors.RESET} has {character.hp} hp left\n"
             else:
-                result += f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to "\
-                          f"{Bcolors.CHARACTER}{character.__class__.__name__} ({name}). "\
+                result += f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to " \
+                          f"{Bcolors.CHARACTER}{character.__class__.__name__} ({name}). " \
                           f" {character.__class__.__name__} {Bcolors.RESET}left the game\n"
                 self.dead_players.append(player)
                 self.players_list.remove(player)
@@ -273,32 +273,63 @@ class Game:
     # FILE DEF
     # --------------------------------------------------------------------------------------------- #
 
+    # def save_file(self, file):
+    #     global player
+    #     try:
+    #         game_info = {'stages': self.stages, 'current_stage': self.current_stage,
+    #                      'player_turn': self.player_turn}
+    #
+    #         players_list = []
+    #         enemies_list = []
+    #         dead_players = []
+    #
+    #         for player in self.players_list:
+    #             character = player['character']
+    #             player_info = {'class': character.__class__.__name__, 'hp': character.hp}
+    #             players_list.append(player_info)
+    #         game_info['players_list'] = players_list
+    #
+    #         for enemy in self.enemies_list:
+    #             enemy_info = {'class': enemy.__class__.__name__, 'hp': enemy.hp}
+    #             enemies_list.append(enemy_info)
+    #         game_info['enemies_list'] = enemies_list
+    #
+    #         for player_dead in self.dead_players:
+    #             character = player_dead['character']
+    #             player_dead_info = {'class': character.__class__.__name__, 'hp': character.hp}
+    #             dead_players.append(player_dead_info)
+    #         game_info['dead_players'] = dead_players
+    #
+    #         with open(file, 'w') as f:
+    #             f.write(json.dumps(game_info))
+    #         result = "The game has been saved!!\n"
+    #     except FileNotFoundError:
+    #         result = "The file was not found."
+    #     return result
+
     def save_file(self, file):
         global player
         try:
             game_info = {'stages': self.stages, 'current_stage': self.current_stage,
                          'player_turn': self.player_turn}
 
-            players_list = []
-            enemies_list = []
-            dead_players = []
-
+            dict_alive_players = []
             for player in self.players_list:
-                character = player['character']
-                player_info = {'class': character.__class__.__name__, 'hp': character.hp}
-                players_list.append(player_info)
-            game_info['players_list'] = players_list
+                player_info = {'character': player['character'].info_player()}
+                dict_alive_players.append(player_info)
+            game_info['players_list'] = dict_alive_players
 
+            dict_enemies = []
             for enemy in self.enemies_list:
-                enemy_info = {'class': enemy.__class__.__name__, 'hp': enemy.hp}
-                enemies_list.append(enemy_info)
-            game_info['enemies_list'] = enemies_list
+                enemy_info = {enemy.info_enemy()}
+                dict_enemies.append(enemy_info)
+            game_info['enemies_list'] = dict_enemies
 
-            for player_dead in self.dead_players:
-                character = player_dead['character']
-                player_dead_info = {'class': character.__class__.__name__, 'hp': character.hp}
-                dead_players.append(player_dead_info)
-            game_info['dead_players'] = dead_players
+            dict_dead_players = []
+            for player in self.dead_players:
+                player_dead_info = {'character': player['character'].info_player()}
+                dict_dead_players.append(player_dead_info)
+            game_info['dead_players'] = dict_dead_players
 
             with open(file, 'w') as f:
                 f.write(json.dumps(game_info))
@@ -306,3 +337,4 @@ class Game:
         except FileNotFoundError:
             result = "The file was not found."
         return result
+

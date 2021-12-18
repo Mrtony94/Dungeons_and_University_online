@@ -36,6 +36,9 @@ class Enemy:
         result = f"{self.__class__.__name__}: Stats: {self.hp} HP and {self.dmg} DMG\n"
         return result
 
+    def info_enemy(self):
+        return {'class': self.__class__.__name__, 'hp': self.hp}
+
     # --------------------------------------------------------------------------------------------- #
     # MONSTERS CLASS (clases hijas)
     # --------------------------------------------------------------------------------------------- #
