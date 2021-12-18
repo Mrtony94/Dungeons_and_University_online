@@ -142,19 +142,19 @@ MENU:
         if games:
             menu = """GAMES
 **********************\n"""
-            option_range = []
-            for game in games.values():  # partidas que no están llenas
-                menu += f"{game.id}.-{game.info()}\n"
-                option_range.append(game.id)
-            menu += "**********************\n"
-            msg = {'header': protocols.GAMES, 'menu': menu,
-                   'options_range': option_range}
-            protocols.send_one_msg(self.client_socket, msg)
         else:
-            self.send_games()
+            menu = """**********************
+There are not GAMES\n"""
+            self.send_dc_server()
 
-
-
+        option_range = []
+        for game in games.values():  # partidas que no están llenas
+            menu += f"{game.id}.-{game.info()}\n"
+            option_range.append(game.id)
+        menu += "**********************\n"
+        msg = {'header': protocols.GAMES, 'menu': menu,
+               'options_range': option_range}
+        protocols.send_one_msg(self.client_socket, msg)
 
     def send_dc_server(self):
         msg = {'header': protocols.DC_SERVER, 'reason': "You have been disconnected"}
