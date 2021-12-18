@@ -49,11 +49,14 @@ class InvalidProtocol(Exception):
 
 
 def send_one_msg(sock, msg):  # to --> message(dic)
-    data_encode = json.dumps(msg).encode()  # transforma el diccionario en un string y lo codifica en 1 y 0
-    length = len(data_encode)  # obtiene el tamaño del string
-    header = struct.pack('!I', length)  # codifica el tamaño en un formato de 4 bytes
-    sock.sendall(header)  # envía el tamaño
-    sock.sendall(data_encode)  # envía el string
+    try:
+        data_encode = json.dumps(msg).encode()  # transforma el diccionario en un string y lo codifica en 1 y 0
+        length = len(data_encode)  # obtiene el tamaño del string
+        header = struct.pack('!I', length)  # codifica el tamaño en un formato de 4 bytes
+        sock.sendall(header)  # envía el tamaño
+        sock.sendall(data_encode)  # envía el string
+    except OSError:
+        raise ConnectionClosed()
 
 
 def receive_one_msg(sock):  # from --> message(dic)
