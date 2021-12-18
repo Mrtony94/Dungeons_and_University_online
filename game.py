@@ -307,6 +307,9 @@ class Game:
     #         result = "The file was not found."
     #     return result
 
+    def player_save_file(self, file):
+        return self.save_file(file)
+
     def save_file(self, file):
         global player
         try:
@@ -321,7 +324,7 @@ class Game:
 
             dict_enemies = []
             for enemy in self.enemies_list:
-                enemy_info = {enemy.info_enemy()}
+                enemy_info = {'class': enemy.__class__.__name__, 'hp': enemy.hp}
                 dict_enemies.append(enemy_info)
             game_info['enemies_list'] = dict_enemies
 
