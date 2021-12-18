@@ -340,4 +340,3 @@ class Game:
         except FileNotFoundError:
             result = "The file was not found."
         return result
-
