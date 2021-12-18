@@ -183,9 +183,9 @@ class Client:
     def handle_end_game(self, msg):
         win = msg['win']
         if win:
-            print("All the stages haven been cleared. You won the game!")
+            print("All the stages haven been cleared. You won the game!\n")
         else:
-            print("All characters have been defeated. Try again")
+            print("All characters have been defeated. Try again\n")
         self.end = True
 
     def handle_dc_server(self, msg):
