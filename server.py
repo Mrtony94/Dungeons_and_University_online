@@ -192,6 +192,7 @@ There are not GAMES
     # --------------------------------------------------------------------------------------------- #
 
     def handle_load_game(self, msg):
+        global text
         file_name = msg['file_name']
         if not file_name.endswith('.json') and not file_name.endswith('.txt'):
             self.send_load_game_answer(False, "File name must end with .json or .txt")
@@ -209,11 +210,13 @@ There are not GAMES
                 self.player['client_address'] = self.client_address
                 self.game.creator = self.name
                 self.game.n_players = 1
-                self.send_load_game_answer(True,
-                                           f"File found, the game has been loaded. The {self.name} character was assigned to you.")
+                text = f"File found, the game has been loaded. The {self.player['name']} character was assigned to you."
+                text += "\nWaiting for other player to join the game"
+                self.send_load_game_answer(True, text)
                 print(f"(LOAD) {self.name} File loaded from {file_name}")
             except FileNotFoundError:
-                self.send_load_game_answer(False, "The file was not found ")
+                text = f"File not found, please check the file name and try again."
+        self.send_load_game_answer(False, text)
 
     def handle_server_option(self, msg):
         option = msg['option']
