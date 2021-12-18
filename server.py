@@ -151,7 +151,7 @@ MENU:
                    'options_range': option_range}
             protocols.send_one_msg(self.client_socket, msg)
         else:
-            raise Exception("No games available")
+            self.send_games()
 
 
 
