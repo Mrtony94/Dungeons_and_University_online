@@ -139,7 +139,13 @@ MENU:
         protocols.send_one_msg(self.client_socket, msg)
 
     def send_games(self):
-        menu = "**********************\n"  # información de los jugadores
+        if games:
+            menu = """GAMES
+             **********************\n"""
+        else:
+            menu = """**********************
+There are not GAMES\n"""
+
         option_range = []
         for game in games.values():  # partidas que no estan llenas
             menu += f"{game.id}.-{game.info()}\n"
@@ -156,20 +162,20 @@ MENU:
 
     def send_end_game(self):
         global games, clients
-        print(f"(GAMEEND) {self.name} game ended. They lost ")  # hay mas de 1 jugador como lo metemos
+        print(f"(GAMEEND) {self.name} game ended. They lost  ")  # hay mas de 1 jugador como lo metemos
         msg = {'header': protocols.END_GAME, 'win': self.game.end_game}
         for player in self.game.all_players():
             protocols.send_one_msg(player['client_socket'], msg)
-            # eliminar los clientes de la lista de clientes
+            # eliminar los clientes del diccionario de clientes
             if clients[player['client_address']]:
-                del clients[self.player['client_address']]
+                clients.pop(player['client_address'])
             # eliminar la partida de la lista de partidas
         if self.game.id in games:
             del games[self.game.id]
         self.end = True
 
     def send_your_turn(self, player):
-        message = f"{self.player['character'].name()}: What do you want to do? >>"
+        message = f"{self.player['character'].name()}: What do you want to do? >> "
         options_range = ["a", "s"]
         msg = {'header': protocols.YOUR_TURN, 'message': message, 'options_range': options_range}
         protocols.send_one_msg(player['client_socket'], msg)
