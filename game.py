@@ -154,8 +154,8 @@ class Game:
         if command == "a":
             result += self.enemies_random_attack(player)  # player attacks enemy
             if len(self.enemies_list) == 0:
-                result += f"current stages -->{self.current_stage} stages -->{self.stages}"
-                if self.current_stage == self.stages:
+                if self.current_stage == int(self.stages):
+                    result += f"{Bcolors.STAGE}Stage {self.current_stage} finished!\n"
                     self.end_game = True
                 else:
                     self.change_turn()
@@ -202,12 +202,12 @@ class Game:
         if enemy.hp == 0:
             self.enemies_list.remove(enemy)
             result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} ({name}) "\
-                     f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. "\
-                     f"{enemy.__class__.__name__} {Bcolors.RESET}dead\n"
+                      f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. "\
+                      f"{enemy.__class__.__name__} {Bcolors.RESET}dead\n"
         else:
             result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} ({name}) "\
-                     f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. "\
-                     f"{enemy.__class__.__name__} {Bcolors.RESET}has {enemy.hp} hp left\n"
+                      f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. "\
+                      f"{enemy.__class__.__name__} {Bcolors.RESET}has {enemy.hp} hp left\n"
         return result
 
     def play_enemies_turn(self):
@@ -221,12 +221,12 @@ class Game:
             dmg_attack = enemy.attack(character)
             if character.hp > 0:
                 result += f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to "\
-                         f"{Bcolors.CHARACTER}{character.__class__.__name__} ({name})."\
-                         f" {character.__class__.__name__} {Bcolors.RESET} has {character.hp} hp left\n"
+                          f"{Bcolors.CHARACTER}{character.__class__.__name__} ({name})."\
+                          f" {character.__class__.__name__} {Bcolors.RESET} has {character.hp} hp left\n"
             else:
                 result += f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to "\
-                         f"{Bcolors.CHARACTER}{character.__class__.__name__} ({name}). "\
-                         f" {character.__class__.__name__} {Bcolors.RESET}left the game\n"
+                          f"{Bcolors.CHARACTER}{character.__class__.__name__} ({name}). "\
+                          f" {character.__class__.__name__} {Bcolors.RESET}left the game\n"
                 self.dead_players.append(player)  # se añade al jugador muerto a la lista de muertos
                 self.players_list.remove(player)  # se elimina al jugador de la lista de jugadores
             if len(self.players_list) == 0:
