@@ -164,6 +164,7 @@ class Game:
                         player['character'].level_up()
                     self.enemies_generate()
                     result += self.print_stage()
+                    result += self.print_enemies()
             else:
                 if self.player_turn == 1:
                     result += self.play_enemies_turn()
