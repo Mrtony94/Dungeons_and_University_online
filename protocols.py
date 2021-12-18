@@ -58,7 +58,7 @@ def send_one_msg(sock, msg):  # to --> message(dic)
 
 def receive_one_msg(sock):  # from --> message(dic)
     header_buffer = receive_all(sock, 4)  # recibe el tamaño del string
-    # recibe el tamaño del string, ponemos 4 porque se refiere a numeros en binario de 0 a 9
+    # recibe el tamaño del string, ponemos 4 porque se refiere a números en binario de 0 a 9
     if not header_buffer:  # si no hay datos
         raise ConnectionClosed()
     else:

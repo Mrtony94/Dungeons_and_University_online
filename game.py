@@ -168,8 +168,7 @@ class Game:
                 if self.player_turn == 1:
                     result += self.play_enemies_turn()
                     if len(self.players_list) != 0:  # si aún hay jugadores vivos
-                        # poner la posición del turno a 0
-                        self.player_turn = 0
+                        self.player_turn = 0  # poner la posición del turno a 0
                 else:
                     self.change_turn()
         elif command == "s":
