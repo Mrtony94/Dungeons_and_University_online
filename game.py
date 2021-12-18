@@ -171,7 +171,6 @@ class Game:
                         self.player_turn = 0  # poner la posición del turno a 0
                 else:
                     self.change_turn()
-                    result += self.play_enemies_turn()
         elif command == "s":
             result += self.save_file(file_name)
         return result
