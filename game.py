@@ -39,6 +39,7 @@ class Game:
         self.enemies_list = []
         self.enemies_turn = False
         self.end_game = False
+        self.win = False
         self.from_file = False
 
     # --------------------------------------------------------------------------------------------- #
@@ -263,9 +264,9 @@ class Game:
 
     def player_wins(self):
         if len(self.players_list) == 0:
-            result = "\n All characters have been defeated. Try again."
+            result = self.win = True
         else:
-            result = f"{Bcolors.WON}\nAll the stages have been cleared. You won the game!{Bcolors.RESET}"
+            result = self.win = False
         return result
 
     # --------------------------------------------------------------------------------------------- #
