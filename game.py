@@ -66,11 +66,7 @@ class Game:
         game.current_stage = dict_data["current_stage"]
         game.players_list = dict_data["players_list"]
         game.dead_players = dict_data["dead_players"]
-        game.n_players = dict_data["n_players"]
         game.player_turn = dict_data["player_turn"]
-        game.enemies_turn = dict_data["enemies_turn"]
-        game.end_game = dict_data["end_game"]
-        game.from_file = dict_data["from_file"]
 
         return game
 
@@ -272,40 +268,6 @@ class Game:
     # --------------------------------------------------------------------------------------------- #
     # FILE DEF
     # --------------------------------------------------------------------------------------------- #
-
-    # def save_file(self, file):
-    #     global player
-    #     try:
-    #         game_info = {'stages': self.stages, 'current_stage': self.current_stage,
-    #                      'player_turn': self.player_turn}
-    #
-    #         players_list = []
-    #         enemies_list = []
-    #         dead_players = []
-    #
-    #         for player in self.players_list:
-    #             character = player['character']
-    #             player_info = {'class': character.__class__.__name__, 'hp': character.hp}
-    #             players_list.append(player_info)
-    #         game_info['players_list'] = players_list
-    #
-    #         for enemy in self.enemies_list:
-    #             enemy_info = {'class': enemy.__class__.__name__, 'hp': enemy.hp}
-    #             enemies_list.append(enemy_info)
-    #         game_info['enemies_list'] = enemies_list
-    #
-    #         for player_dead in self.dead_players:
-    #             character = player_dead['character']
-    #             player_dead_info = {'class': character.__class__.__name__, 'hp': character.hp}
-    #             dead_players.append(player_dead_info)
-    #         game_info['dead_players'] = dead_players
-    #
-    #         with open(file, 'w') as f:
-    #             f.write(json.dumps(game_info))
-    #         result = "The game has been saved!!\n"
-    #     except FileNotFoundError:
-    #         result = "The file was not found."
-    #     return result
 
     def player_save_file(self, file):
         return self.save_file(file)

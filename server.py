@@ -210,7 +210,7 @@ There are not GAMES
                 self.game.creator = self.name
                 self.game.n_players = 1
                 self.send_load_game_answer(True,
-                                           f"File found, the game has been loaded. The {self.player['character'].name()} character was assigned to you.")
+                                           f"File found, the game has been loaded. The {self.name} character was assigned to you.")
                 print(f"(LOAD) {self.name} File loaded from {file_name}")
             except FileNotFoundError:
                 self.send_load_game_answer(False, "The file was not found ")
