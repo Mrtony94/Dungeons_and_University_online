@@ -238,13 +238,7 @@ There are not GAMES
     def handle_character(self, msg):
         global clients, games
         option = msg['option']
-
         self.player = self.game.add_player(option, self.name, self.client_socket, self.client_address)
-
-        # self.name = clients['client_socket']
-        # self.game_id = games['client_address']
-        # self.game = games[self.game_id]
-        print(self.game.can_join())
         if self.game.can_join():
             print(f"(START) {self.name} has started the game")
             ClientHandler.send_server_msg_to_all(f"{self.game.print_stage()}{self.game.print_enemies()}",
