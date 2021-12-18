@@ -264,9 +264,9 @@ class Game:
 
     def player_wins(self):
         if len(self.players_list) == 0:
-            result = self.win = True
-        else:
             result = self.win = False
+        else:
+            result = self.win = True
         return result
 
     # --------------------------------------------------------------------------------------------- #
