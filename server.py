@@ -167,7 +167,7 @@ There are not GAMES
 
     def send_end_game_all_players(self):
         global games, clients
-        print(f"(GAME_END) {self.name} game ended. They lost  ")
+        print(f"(GAME_END) {self.name} game ended.")
         msg = {'header': protocols.END_GAME, 'win': self.game.end_game}
         for player in self.game.all_players():
             protocols.send_one_msg(player['client_socket'], msg)
