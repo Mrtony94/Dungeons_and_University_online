@@ -141,10 +141,11 @@ MENU:
     def send_games(self):
         if games:
             menu = """GAMES
-             **********************\n"""
+**********************\n"""
         else:
             menu = """**********************
 There are not GAMES\n"""
+            self.send_welcome()
 
         option_range = []
         for game in games.values():  # partidas que no están llenas
