@@ -78,7 +78,6 @@ class ClientHandler(Thread):
         Thread.__init__(self)
         self.client_socket = client_socket
         self.client_address = client_address
-        # Cada hilo tiene su propio id
         self.name = ""
         self.game = None
         self.player = None
@@ -113,7 +112,7 @@ MENU:
             ClientHandler.send_server_msg_to_one(text, player['client_socket'])
 
     @staticmethod
-    def games_for_join():  # devuelve las partidas que no están llenas (esta fantasia nose si está bien)
+    def games_for_join():
         return [game for game in games.values() if not game.can_join]
 
     # --------------------------------------------------------------------------------------------- #
@@ -348,7 +347,7 @@ There are not GAMES
             try:
                 msg = protocols.receive_one_msg(self.client_socket)
                 self.handle_msg(msg)
-            except protocols.ConnectionClosed:  # si se cierra la connexion
+            except protocols.ClosedConnection:  # si se cierra la connexion
                 self.end = True
                 print(f"{self.name} has left the game")
         self.client_socket.close()

@@ -152,7 +152,7 @@ class Game:
     def player_execute_command(self, player, command, file_name=None):
         result = ""
         if command == "a":
-            result += self.enemies_random_attack(player)  # player attacks enemy
+            result += self.enemies_random_attack(player)  # El ataque de los jugadores
             if len(self.enemies_list) == 0:
                 if self.current_stage == int(self.stages):
                     result += f"{Bcolors.STAGE}Stage {self.current_stage} finished!\n"
@@ -168,8 +168,8 @@ class Game:
             else:
                 if self.player_turn == len(self.players_list) - 1:
                     result += self.play_enemies_turn()
-                    if len(self.players_list) != 0:  # si aún hay jugadores vivos
-                        self.player_turn = 0  # poner la posición del turno a 0
+                    if len(self.players_list) != 0:
+                        self.player_turn = 0
                 else:
                     self.change_turn()
         elif command == "s":
@@ -190,7 +190,7 @@ class Game:
                     self.enemies_list.append(enemy_class(self.current_stage))
                     valid_enemy = True
 
-    def enemies_random_attack(self, player):  # player no character
+    def enemies_random_attack(self, player):
 
         name = player['name']
         result = f"{Bcolors.MONSTER}\n     -----------------------\n"\
@@ -227,8 +227,8 @@ class Game:
                 result += f"{Bcolors.MONSTER}The {enemy.__class__.__name__} {Bcolors.RESET}did {dmg_attack}DMG to "\
                           f"{Bcolors.CHARACTER}{character.__class__.__name__} ({name}). "\
                           f" {character.__class__.__name__} {Bcolors.RESET}left the game\n"
-                self.dead_players.append(player)  # se añade al jugador muerto a la lista de muertos
-                self.players_list.remove(player)  # se elimina al jugador de la lista de jugadores
+                self.dead_players.append(player)
+                self.players_list.remove(player)
             if len(self.players_list) == 0:
                 self.end_game = True
                 break
@@ -246,13 +246,13 @@ class Game:
             self.player_turn = 0
         return self.player_turn
 
-    def player_in_turn(self):  # DUDA
+    def player_in_turn(self):
         if self.player_turn == 0:
             return self.players_list[0]
         else:
             return self.players_list[1]
 
-    def another_character(self):  # ESTO DUDA JAVI
+    def another_character(self):
         if len(self.players_list) == Game.PLAYERS:
             # devuelve el jugador que no le toca el turno
             return self.players_list[0] if self.player_turn == 1 else self.players_list[1]
@@ -295,7 +295,7 @@ class Game:
             game_info['enemies_list'] = enemies_list
 
             for player_dead in self.dead_players:
-                character = player['character']
+                character = player_dead['character']
                 player_dead_info = {'class': character.__class__.__name__, 'hp': character.hp}
                 dead_players.append(player_dead_info)
             game_info['dead_players'] = dead_players

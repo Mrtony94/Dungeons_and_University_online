@@ -21,7 +21,6 @@ class Enemy:
     def __str__(self):
         result = f"HP: {self.hp} DMG: {self.dmg}"
         return result
-        #  información util para el juego, daño que ha echo o lo que queda de vida por cada jugador
 
     def attack(self, character):
         dmg_attack = random.randint(1, self.dmg)

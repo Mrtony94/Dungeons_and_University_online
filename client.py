@@ -18,7 +18,6 @@ import protocols
 
 
 def parse_args():
-    # controlar numero de niveles, nombre, ip del servidor y puerto del servidor
     args, trash = getopt.getopt(sys.argv[1:], 's:n:i:p:',
                                 ["stages=", "name=", "ip=", "port="])  # version corta - y version larga --
     port = 7123
@@ -161,9 +160,7 @@ class Client:
     def handle_your_turn(self, msg):
         command = Client.get_string_command(msg['message'], msg['options_range'])
         if command == 's':
-            # solicitar nombre del fichero al usuario
             file_name = input("what's the name of the file: ")
-            # si el nombre del fichero es 'cancel' se envia un mensaje de cancelacion
             if file_name == 'cancel':
                 print("The game was not saved.")
                 self.handle_your_turn(msg)
@@ -245,7 +242,7 @@ class Client:
             except KeyboardInterrupt:
                 self.send_dc_me_msg()
                 self.end = True
-            except protocols.ConnectionClosed as e:
+            except protocols.ClosedConnection as e:
                 print(e)
                 self.end = True
         self.socket.close()

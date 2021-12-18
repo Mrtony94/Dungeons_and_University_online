@@ -18,7 +18,7 @@ class Character:
         self.hp = hp
 
     def __str__(self):
-        result = f"HP_MAX: {self.hp_max} HP: {self.hp} DMG: {self.dmg}"        # devolver información util para el juego
+        result = f"HP_MAX: {self.hp_max} HP: {self.hp} DMG: {self.dmg}"
         return result
 
     def attack(self, enemy):

@@ -28,7 +28,7 @@ GAMES = 'GAMES'  # Mensaje que le envía el servidor al cliente con la lista de 
 GAMES_CHOICE = 'GAMES_CHOICE'  # Mensaje que le envía el cliente al servidor con la partida seleccionada
 VALID_GAMES = 'VALID_GAMES'  # Mensaje que envía el servidor al cliente si se ha podido unir a la partida seleccionada
 END_GAME = 'END_GAME'  # Mensaje que envía el servidor al cliente cuando una partida finalizar (Tanto si es por
-# derrota de los jugadores como por victoria).
+# (derrota de los jugadores como por victoria).
 DC_ME = 'DC_ME'  # Mensaje que le envía el cliente al servidor para informarle de que se desconecta. El servidor debe
 # desconectar a todos los jugadores que están en esa partida.
 DC_SERVER = 'DC_SERVER'  # Mensaje que envía el servidor al cliente para desconectarlo.
@@ -36,7 +36,7 @@ SERVER_OPTION = 'SERVER_OPTION'  # Mensaje que le envía el cliente al servidor 
 CHARACTER = 'CHARACTER'  # Mensaje que le envía el cliente al servidor cuando se selecciona un personaje
 
 
-class ConnectionClosed(Exception):  # CAMBIAR NOMBRE closedconnection
+class ClosedConnection(Exception):  # CAMBIAR NOMBRE closedconnection
 
     def __init__(self):
         super().__init__('Connection closed by other')
@@ -56,14 +56,14 @@ def send_one_msg(sock, msg):  # to --> message(dic)
         sock.sendall(header)  # envía el tamaño
         sock.sendall(data_encode)  # envía el string
     except OSError:
-        raise ConnectionClosed()
+        raise ClosedConnection()
 
 
 def receive_one_msg(sock):  # from --> message(dic)
     header_buffer = receive_all(sock, 4)  # recibe el tamaño del string
     # recibe el tamaño del string, ponemos 4 porque se refiere a números en binario de 0 a 9
     if not header_buffer:  # si no hay datos
-        raise ConnectionClosed()
+        raise ClosedConnection()
     else:
         header = struct.unpack('!I', header_buffer)  # decodifica el tamaño
         length = header[0]  # obtiene el tamaño del string
@@ -73,7 +73,7 @@ def receive_one_msg(sock):  # from --> message(dic)
 
 
 def receive_all(sock, length):  # from --> message(dic)
-    buffer = b''  # crea un buffer vacio
+    buffer = b''  # crea un buffer vacío
     while length != 0:  # mientras el tamaño del buffer sea menor al tamaño del string
         buffer_aux = sock.recv(length)  # recibe el string
         if not buffer_aux:  # si no hay datos
