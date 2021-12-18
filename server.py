@@ -141,6 +141,7 @@ MENU:
     def send_games(self):
         if games:
             menu = """GAMES
+            
 **********************\n"""
         else:
             menu = """**********************

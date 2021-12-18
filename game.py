@@ -173,8 +173,6 @@ class Game:
                     self.change_turn()
                 result += "Estp es linea 174"
                 result += self.play_enemies_turn()
-            result += "Estp es linea 176"
-            result += self.play_enemies_turn()
         elif command == "s":
             result += self.save_file(file_name)
         return result
