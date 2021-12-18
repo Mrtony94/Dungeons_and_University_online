@@ -124,7 +124,6 @@ class Game:
         for enemy in self.enemies_list:
             result += enemy.display_attributes()
         result += """+++++++++++++++++++++++++++++++++++++++++
-
 """
         return result
 
