@@ -147,7 +147,7 @@ MENU:
 There are not GAMES\n"""
 
         option_range = []
-        for game in games.values():  # partidas que no estan llenas
+        for game in games.values():  # partidas que no están llenas
             menu += f"{game.id}.-{game.info()}\n"
             option_range.append(game.id)
         menu += "**********************\n"
@@ -266,16 +266,15 @@ There are not GAMES\n"""
                 file = os.path.join(ClientHandler.FILE_DIRECTORY, file_name)
                 result = self.game.player_execute_command(self.player, command, file)
                 ClientHandler.send_server_msg_to_one(result, self.player['client_socket'])
-                player = self.game.player_in_turn()  # el jugador que le toca el turno
+                player = self.game.player_in_turn()
                 self.send_your_turn(player)
         else:
             result = self.game.player_execute_command(self.player, command)
             ClientHandler.send_server_msg_to_all(result, self.game.all_players())
             if self.game.finish_game():
-                # enviar un mensaje a todos los clientes de la partida con el mensaje (END_GAME) a todos los jugadores
                 self.send_end_game_all_players()
             else:
-                player = self.game.player_in_turn()  # el jugador que le toca el turno
+                player = self.game.player_in_turn()
                 self.send_your_turn(player)
 
     def handle_game_choice(self, msg):
@@ -318,14 +317,10 @@ There are not GAMES\n"""
                 if player != self.player:
                     print(f"(DC_ME) {self.name} was disconnected.")
                     protocols.send_one_msg(player['client_socket'], msg)
-                    # borrar al cliente del diccionario de clientes
-                    # self.player['client_socket'].close()
-                    del clients[player['client_address']]
-            # borrar la partida del diccionario de partidas
-            del games[self.game.id] # Mal
+                    del clients[player['client_address']]  # borrar al cliente del diccionario de clientes
+            del games[self.game.id]  # Mal # borrar la partida del diccionario de partidas
             print(f"{self.name} was disconnected from {self.game.id} game.")
-            # borrar al cliente actual del diccionario de clientes
-            del clients[self.player['client_address']]
+            del clients[self.player['client_address']]  # borrar al cliente actual del diccionario de clientes
             self.end = True
 
     # --------------------------------------------------------------------------------------------- #
@@ -337,7 +332,7 @@ There are not GAMES\n"""
         if header == protocols.JOIN:
             self.handle_join(msg)
         elif header == protocols.CHARACTER_COMMAND:
-            self.handle_character_command(msg)  # Send_character, ese no es
+            self.handle_character_command(msg)
         elif header == protocols.GAMES_CHOICE:
             self.handle_game_choice(msg)
         elif header == protocols.DC_ME:
@@ -352,8 +347,8 @@ There are not GAMES\n"""
     def run(self):
         while not self.end:
             try:
-                msg = protocols.receive_one_msg(self.client_socket)  # recibe mensaje del cliente
-                self.handle_msg(msg)  # maneja el mensaje
+                msg = protocols.receive_one_msg(self.client_socket)
+                self.handle_msg(msg)
             except protocols.ConnectionClosed:  # si se cierra la connexion
                 self.end = True
                 print(f"{self.name} has left the game")
