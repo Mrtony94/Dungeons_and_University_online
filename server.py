@@ -145,6 +145,7 @@ MENU:
         else:
             menu = """**********************
 There are not GAMES\n"""
+            self.send_server_msg_to_one(menu, self.client_socket)
             self.send_dc_server()
 
         option_range = []
