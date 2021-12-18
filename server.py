@@ -26,7 +26,7 @@ clients = {}
 
 
 def parse_args():
-    args, trash = getopt.getopt(sys.argv[1:], 'p:', ["port="])  # version corta - y version larga --
+    args, trash = getopt.getopt(sys.argv[1:], 'p:', ["port="])
     port = 7123
     for arg, val in args:
         if arg in ('-p', '--port'):
@@ -36,7 +36,7 @@ def parse_args():
 
 def check_args(port):
     try:
-        if int(port) > 1024:  # asi esta bien o ponemos int(port) >= 1024 ??????
+        if int(port) > 1024:
             return True
         else:
             raise ValueError
@@ -72,7 +72,7 @@ class Server(Thread):
 
 
 class ClientHandler(Thread):
-    FILE_DIRECTORY = 'games_file'  # carpeta donde se guardan los archivos de los juegos
+    FILE_DIRECTORY = 'games_file'
 
     def __init__(self, client_socket, client_address):
         Thread.__init__(self)
@@ -113,11 +113,11 @@ MENU:
             ClientHandler.send_server_msg_to_one(text, player['client_socket'])
 
     @staticmethod
-    def games_for_join():  # devuelve las partidas que no estan llenas (esta fantasia nose si esta bien)
+    def games_for_join():  # devuelve las partidas que no están llenas (esta fantasia nose si está bien)
         return [game for game in games.values() if not game.can_join]
 
     # --------------------------------------------------------------------------------------------- #
-    # JOIN & SEND FUNTIONS
+    # JOIN & SEND FUNCTIONS
     # --------------------------------------------------------------------------------------------- #
 
     def handle_join(self, msg):
@@ -152,7 +152,7 @@ There are not GAMES\n"""
             option_range.append(game.id)
         menu += "**********************\n"
         msg = {'header': protocols.GAMES, 'menu': menu,
-               'options_range': option_range}  # esto esta mal no lo entiendo javi
+               'options_range': option_range}
         protocols.send_one_msg(self.client_socket, msg)
 
     def send_dc_server(self):
@@ -160,16 +160,14 @@ There are not GAMES\n"""
         protocols.send_one_msg(self.client_socket, msg)
         self.client_socket.close()
 
-    def send_end_game(self):
+    def send_end_game_all_players(self):
         global games, clients
-        print(f"(GAMEEND) {self.name} game ended. They lost  ")  # hay mas de 1 jugador como lo metemos
+        print(f"(GAME_END) {self.name} game ended. They lost  ")
         msg = {'header': protocols.END_GAME, 'win': self.game.end_game}
         for player in self.game.all_players():
             protocols.send_one_msg(player['client_socket'], msg)
-            # eliminar los clientes del diccionario de clientes
             if clients[player['client_address']]:
                 clients.pop(player['client_address'])
-            # eliminar la partida de la lista de partidas
         if self.game.id in games:
             del games[self.game.id]
         self.end = True
@@ -185,7 +183,7 @@ There are not GAMES\n"""
         protocols.send_one_msg(self.client_socket, msg)
 
     # --------------------------------------------------------------------------------------------- #
-    # HANDLE FUNTIONS
+    # HANDLE FUNCTIONS
     # --------------------------------------------------------------------------------------------- #
 
     def handle_load_game(self, msg):
@@ -218,11 +216,11 @@ There are not GAMES\n"""
         if option == 1:
             global id, games, clients
             print(f"(CREATE) {self.name} has created a new game")
-            self.game = Game(id, self.name, stages)  # crea el juego esta bien javi?
-            games[id] = self.game  # agrega el juego a la lista de juegos
-            clients[self.client_address] = id  # agrega él, id del juego a la lista de clientes
+            self.game = Game(id, self.name, stages)
+            games[id] = self.game
+            clients[self.client_address] = id
             id += 1
-            self.send_choose_character()  # envia el mensaje al cliente
+            self.send_choose_character()
         elif option == 2:
             self.send_games()
         elif option == 3:
@@ -245,14 +243,11 @@ There are not GAMES\n"""
         if self.game.can_join():
             print(f"(START) {self.name} has started the game")
             ClientHandler.send_server_msg_to_all(f"{self.game.print_stage()}{self.game.print_enemies()}",
-                                                 self.game.all_players())  # como se hace la parte de tecto de la info? llamamos la info de game.py?
+                                                 self.game.all_players())
             ClientHandler.send_server_msg_to_all(
                 f"A game with {self.game.stages} stage(s) will be set up for {self.game.PLAYERS} players.\n",
                 self.game.all_players())
-
-            # sacamos el turno del jugador y lo enviamos como se hace esto?
             player = self.game.player_in_turn()
-            # self.current_player = self.game.player_turn
             self.send_your_turn(player)
         else:
             ClientHandler.send_server_msg_to_one("\nWaiting for other players to join the game",
@@ -276,14 +271,11 @@ There are not GAMES\n"""
         else:
             result = self.game.player_execute_command(self.player, command)
             ClientHandler.send_server_msg_to_all(result, self.game.all_players())
-        # si la partida ha terminado
             if self.game.finish_game():
                 # enviar un mensaje a todos los clientes de la partida con el mensaje (END_GAME) a todos los jugadores
-                self.send_end_game()
+                self.send_end_game_all_players()
             else:
-                # extraer el jugador al que le toca el turno y enviarle un mensaje con el mensaje (YOUR_TURN)
                 player = self.game.player_in_turn()  # el jugador que le toca el turno
-                # Enviar un mensaje your_turn al jugador que le toca el turno
                 self.send_your_turn(player)
 
     def handle_game_choice(self, msg):
@@ -324,12 +316,11 @@ There are not GAMES\n"""
             msg = {'header': protocols.DC_SERVER, 'reason': f"{self.name} disconnected"}
             for player in self.game.all_players():
                 if player != self.player:
-                    print(f"(DC) {self.name} was disconnected.")
+                    print(f"(DC_ME) {self.name} was disconnected.")
                     protocols.send_one_msg(player['client_socket'], msg)
                     # borrar al cliente del diccionario de clientes
                     # self.player['client_socket'].close()
                     del clients[player['client_address']]
-
             # borrar la partida del diccionario de partidas
             del games[self.game.id] # Mal
             print(f"{self.name} was disconnected from {self.game.id} game.")
