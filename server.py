@@ -216,7 +216,7 @@ There are not GAMES
                 print(f"(LOAD) {self.name} File loaded from {file_name}")
             except FileNotFoundError:
                 text = f"File not found, please check the file name and try again."
-        self.send_load_game_answer(False, text)
+                self.send_load_game_answer(False, text)
 
     def handle_server_option(self, msg):
         option = msg['option']
@@ -299,16 +299,17 @@ There are not GAMES
                 self.send_valid_game(True)
                 if game.from_file:
                     self.player = self.game.another_character()
-                    self.player['name'] = self.player['name']
-                    self.player['client_socket'] = self.player['client_socket']
-                    self.player['client_address'] = self.player['client_address']
+                    self.player['name'] = self.name
+                    self.player['client_socket'] = self.client_socket
+                    self.player['client_address'] = self.client_address
                     self.game.n_players += 1
                     self.send_server_msg_to_one(f"{self.player['name']} has joined the game",
                                                 self.player['client_socket'])
                     print(f"(START) {game.players_names()} continued a game")
 
                     player = self.game.player_in_turn()
-                    ClientHandler.send_server_msg_to_all(player, game.all_players())
+                    ClientHandler.send_server_msg_to_all(f"{self.game.print_stage()}{self.game.print_enemies()}",
+                                                         self.game.all_players())
                     self.send_your_turn(player)
                 else:
                     self.send_choose_character()

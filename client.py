@@ -194,7 +194,7 @@ class Client:
         valid = msg['valid']
         message = msg['message']
         if valid:
-            print(valid)
+            print(message)
         else:
             print(message, end="")
             file_name = input("Try again: ")
