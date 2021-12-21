@@ -36,7 +36,7 @@ class Game:
         self.players_list = []
         self.dead_players = []
         self.n_players = 0
-        self.player_turn = 0  # index at players_list
+        self.player_turn = 0
         self.enemies_list = []
         self.enemies_turn = False
         self.end_game = False
@@ -180,7 +180,7 @@ class Game:
     def player_execute_command(self, player, command, file_name=None):
         result = ""
         if command == "a":
-            result += self.enemies_random_attack(player)  # El ataque de los jugadores
+            result += self.enemies_random_attack(player)
             if len(self.enemies_list) == 0:
                 if self.current_stage == int(self.stages):
                     result += f"\n{Bcolors.STAGE}STAGE {self.current_stage} FINISHED!\n{Bcolors.RESET}"
@@ -226,7 +226,7 @@ class Game:
                  f"     -----------------------\n{Bcolors.RESET}"
         character = player['character']
         enemy = random.choice(self.enemies_list)
-        dmg_attack = character.attack(enemy)  # El jugador ataca al enemigo
+        dmg_attack = character.attack(enemy)
         if enemy.hp == 0:
             self.enemies_list.remove(enemy)
             result += f"The {Bcolors.CHARACTER}{character.__class__.__name__} ({name}) " \
@@ -282,7 +282,6 @@ class Game:
 
     def another_character(self):
         if len(self.players_list) == Game.PLAYERS:
-            # devuelve el jugador que no le toca el turno
             return self.players_list[0] if self.player_turn == 1 else self.players_list[1]
         else:
             return self.dead_players

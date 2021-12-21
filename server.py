@@ -56,7 +56,6 @@ class Server(Thread):
     def __init__(self, port):
         Thread.__init__(self)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # reuse socket (quitar en la entrega)
         self.socket.bind((Server.IP, port))
         self.socket.listen()
 
@@ -153,7 +152,7 @@ There are not GAMES
             self.send_dc_server()
 
         option_range = []
-        for game in games.values():  # partidas que no están llenas
+        for game in games.values():
             menu += f"{game.id}.-{game.info()}\n"
             option_range.append(game.id)
         menu += "**********************\n"
@@ -201,11 +200,11 @@ There are not GAMES
             file = os.path.join(ClientHandler.FILE_DIRECTORY, file_name)
             global id, games, clients
             try:
-                self.game = Game.from_file(file, id)  # carga el juego
+                self.game = Game.from_file(file, id)
                 id += 1
-                games[self.game.id] = self.game  # agrega el juego a la lista de juegos
-                clients[self.client_address] = self.game.id  # agrega él, id del juego a la lista de clientes
-                self.player = self.game.player_in_turn()  # obtiene el jugador que tiene el turno
+                games[self.game.id] = self.game
+                clients[self.client_address] = self.game.id
+                self.player = self.game.player_in_turn()
                 self.player['name'] = self.name
                 self.player['client_socket'] = self.client_socket
                 self.player['client_address'] = self.client_address
@@ -233,7 +232,7 @@ There are not GAMES
         elif option == 2:
             self.send_games()
         elif option == 3:
-            pass  # Cargar partida de un fichero
+            pass
         else:
             print(f"(EXIT) {self.name} disconnected")
             self.send_dc_server()
@@ -326,10 +325,10 @@ There are not GAMES
                 if player != self.player:
                     print(f"(DC_ME) {self.name} was disconnected.")
                     protocols.send_one_msg(player['client_socket'], msg)
-                    del clients[player['client_address']]  # borrar al cliente del diccionario de clientes
-            del games[self.game.id]  # Mal # borrar la partida del diccionario de partidas
+                    del clients[player['client_address']]
+            del games[self.game.id]
             print(f"{self.name} was disconnected from {self.game.id} game.")
-            del clients[self.player['client_address']]  # borrar al cliente actual del diccionario de clientes
+            del clients[self.player['client_address']]
             self.end = True
 
     # --------------------------------------------------------------------------------------------- #
@@ -358,7 +357,7 @@ There are not GAMES
             try:
                 msg = protocols.receive_one_msg(self.client_socket)
                 self.handle_msg(msg)
-            except protocols.ClosedConnection:  # si se cierra la connexion
+            except protocols.ClosedConnection:
                 self.end = True
                 print(f"{self.name} has left the game")
         self.client_socket.close()

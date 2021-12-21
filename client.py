@@ -16,7 +16,6 @@ import protocols
 # Control de Arguments SERVER
 # --------------------------------------------------------------------------------------------- #
 
-
 def parse_args():
     args, trash = getopt.getopt(sys.argv[1:], 's:n:i:p:',
                                 ["stages=", "name=", "ip=", "port="])  # version corta - y version larga --
@@ -165,10 +164,8 @@ class Client:
                 print("The game was not saved.")
                 self.handle_your_turn(msg)
             else:
-                # enviar un mensaje CHARACTER_COMMAND al servidor
                 self.send_character_command(command, file_name)
         else:
-            # enviar un mensaje CHARACTER_COMMAND al servidor
             self.send_character_command(command)
 
     def handle_valid_game(self, msg):

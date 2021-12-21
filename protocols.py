@@ -22,7 +22,6 @@ SERVER_MSG = 'SERVER_MSG'  # Mensaje que le envía el servidor al cliente con te
 YOUR_TURN = 'YOUR_TURN'  # Mensaje que le envía el servidor al cliente para decirle que es su turno y pedirle una acción.
 
 # SEND's
-
 CHARACTER_COMMAND = 'CHARACTER_COMMAND'  # Mensaje que el cliente al servidor con el comando seleccionado.
 GAMES = 'GAMES'  # Mensaje que le envía el servidor al cliente con la lista de partidas disponibles.
 GAMES_CHOICE = 'GAMES_CHOICE'  # Mensaje que le envía el cliente al servidor con la partida seleccionada
@@ -36,7 +35,7 @@ SERVER_OPTION = 'SERVER_OPTION'  # Mensaje que le envía el cliente al servidor 
 CHARACTER = 'CHARACTER'  # Mensaje que le envía el cliente al servidor cuando se selecciona un personaje
 
 
-class ClosedConnection(Exception):  # CAMBIAR NOMBRE closedconnection
+class ClosedConnection(Exception):
 
     def __init__(self):
         super().__init__('Connection closed by other')
@@ -48,36 +47,35 @@ class InvalidProtocol(Exception):
         super().__init__("Unknown message received")
 
 
-def send_one_msg(sock, msg):  # to --> message(dic)
+def send_one_msg(sock, msg):
     try:
-        data_encode = json.dumps(msg).encode()  # transforma el diccionario en un string y lo codifica en 1 y 0
-        length = len(data_encode)  # obtiene el tamaño del string
-        header = struct.pack('!I', length)  # codifica el tamaño en un formato de 4 bytes
-        sock.sendall(header)  # envía el tamaño
-        sock.sendall(data_encode)  # envía el string
+        data_encode = json.dumps(msg).encode()
+        length = len(data_encode)
+        header = struct.pack('!I', length)
+        sock.sendall(header)
+        sock.sendall(data_encode)
     except OSError:
         raise ClosedConnection()
 
 
-def receive_one_msg(sock):  # from --> message(dic)
-    header_buffer = receive_all(sock, 4)  # recibe el tamaño del string
-    # recibe el tamaño del string, ponemos 4 porque se refiere a números en binario de 0 a 9
-    if not header_buffer:  # si no hay datos
+def receive_one_msg(sock):
+    header_buffer = receive_all(sock, 4)
+    if not header_buffer:
         raise ClosedConnection()
     else:
-        header = struct.unpack('!I', header_buffer)  # decodifica el tamaño
-        length = header[0]  # obtiene el tamaño del string
-        data_encoded = receive_all(sock, length)  # recibe el string
-        msg = json.loads(data_encoded.decode())  # decodifica el string proceso inverso a dumps
+        header = struct.unpack('!I', header_buffer)
+        length = header[0]
+        data_encoded = receive_all(sock, length)
+        msg = json.loads(data_encoded.decode())
         return msg
 
 
-def receive_all(sock, length):  # from --> message(dic)
-    buffer = b''  # crea un buffer vacío
-    while length != 0:  # mientras el tamaño del buffer sea menor al tamaño del string
-        buffer_aux = sock.recv(length)  # recibe el string
-        if not buffer_aux:  # si no hay datos
+def receive_all(sock, length):
+    buffer = b''
+    while length != 0:
+        buffer_aux = sock.recv(length)
+        if not buffer_aux:
             return None
-        buffer += buffer_aux  # agrega los datos al buffer
-        length -= len(buffer_aux)  # resta el tamaño del buffer al tamaño del string
+        buffer += buffer_aux
+        length -= len(buffer_aux)
     return buffer
