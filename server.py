@@ -13,6 +13,7 @@ import sys
 from threading import Thread
 import errno
 
+import game
 import protocols
 from game import Game
 
@@ -90,8 +91,8 @@ class ClientHandler(Thread):
 
     @staticmethod
     def menu():
-        menu = """
-Welcome to the server! Choose one of this options:
+        menu = f"""{game.Bcolors.WON}
+Welcome to the server! Choose one of this options:{game.Bcolors.RESET}
 
 MENU:       
 
@@ -140,8 +141,8 @@ MENU:
 
     def send_games(self):
         if games:
-            menu = """GAMES
-            
+            menu = f"""
+GAMES
 **********************\n"""
         else:
             menu = """**********************
@@ -178,7 +179,7 @@ There are not GAMES
         self.end = True
 
     def send_your_turn(self, player):
-        message = f"The {player['character'].name()} (Player {self.game.player_turn + 1}): What are you going to do? >> "
+        message = f"The {game.Bcolors.CHARACTER}{player['character'].name()} ({self.player['name']}):{game.Bcolors.RESET} What are you going to do? >> "
         options_range = ["a", "s"]
         msg = {'header': protocols.YOUR_TURN, 'message': message, 'options_range': options_range}
         protocols.send_one_msg(player['client_socket'], msg)
@@ -210,7 +211,7 @@ There are not GAMES
                 self.player['client_address'] = self.client_address
                 self.game.creator = self.name
                 self.game.n_players = 1
-                text = f"File found, the game has been loaded. The {self.player['name']} character was assigned to you."
+                text = f"{game.Bcolors.STAGE}File found, the game has been loaded. The {self.player['name']} character was assigned to you.{game.Bcolors.RESET}"
                 text += "\nWaiting for other player to join the game"
                 self.send_load_game_answer(True, text)
                 print(f"(LOAD) {self.name} File loaded from {file_name}")

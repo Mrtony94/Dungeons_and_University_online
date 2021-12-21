@@ -16,6 +16,7 @@ class Bcolors:
     MONSTER = '\033[91m'  # RED
     WON = '\033[33m'  # NARANJA
     RESET = '\033[0m'  # RESET COLOR
+    BLUE = '\033[94m'  # BLUE
 
 
 class Game:
@@ -53,7 +54,7 @@ class Game:
             result += f"{index + 1}.- "
             result += str(character_class.print_info())
             result += "\n"
-        result += f"********************************************************\n"
+        result += f"********************************************************\n{Bcolors.RESET}"
         return result
 
     @staticmethod
@@ -108,7 +109,7 @@ class Game:
         return self.end_game
 
     def info(self):
-        return f"Player: {self.n_players} / {Game.PLAYERS}\n"
+        return f"{Bcolors.BLUE}Player: {self.n_players} / {Game.PLAYERS}\n{Bcolors.RESET}"
 
     def can_join(self):
         if self.n_players == Game.PLAYERS:
@@ -136,14 +137,14 @@ class Game:
         result = f"{Bcolors.STAGE}\n      ***********************\n" \
                  f"      *       STAGE {self.current_stage}       *\n" \
                  f"      ***********************\n" \
-                 f"\n"
+                 f"\n{Bcolors.RESET}"
         return result
 
     def print_characters_selection(self):
         result = f"{Bcolors.CHARACTER}\n***************PLAYERS*******************"
         for character in self.players_list:
             result += character.display_attributes()
-        result += f"*****************************************"
+        result += f"*****************************************{Bcolors.RESET}"
         return result
 
     def print_enemies(self):
@@ -151,7 +152,7 @@ class Game:
                  f"+++++++++++++++++++++++++++++++++++++++++\n"
         for enemy in self.enemies_list:
             result += enemy.display_attributes()
-        result += """+++++++++++++++++++++++++++++++++++++++++
+        result += f"""+++++++++++++++++++++++++++++++++++++++++{Bcolors.RESET}
 """
         return result
 
@@ -182,7 +183,7 @@ class Game:
             result += self.enemies_random_attack(player)  # El ataque de los jugadores
             if len(self.enemies_list) == 0:
                 if self.current_stage == int(self.stages):
-                    result += f"{Bcolors.STAGE}Stage {self.current_stage} finished!\n"
+                    result += f"\n{Bcolors.STAGE}STAGE {self.current_stage} FINISHED!\n{Bcolors.RESET}"
                     self.end_game = True
                 else:
                     self.change_turn()
@@ -222,17 +223,17 @@ class Game:
         name = player['name']
         result = f"{Bcolors.MONSTER}\n     -----------------------\n" \
                  f"     -    {name.upper()}'s TURN    -\n" \
-                 "     -----------------------\n"
+                 f"     -----------------------\n{Bcolors.RESET}"
         character = player['character']
         enemy = random.choice(self.enemies_list)
         dmg_attack = character.attack(enemy)  # El jugador ataca al enemigo
         if enemy.hp == 0:
             self.enemies_list.remove(enemy)
-            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} ({name}) " \
+            result += f"The {Bcolors.CHARACTER}{character.__class__.__name__} ({name}) " \
                       f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. " \
-                      f"{enemy.__class__.__name__} {Bcolors.RESET}dead\n"
+                      f"{enemy.__class__.__name__} {Bcolors.RESET}dead"
         else:
-            result += f"{Bcolors.CHARACTER}The {character.__class__.__name__} ({name}) " \
+            result += f"The {Bcolors.CHARACTER}{character.__class__.__name__} ({name}) " \
                       f"{Bcolors.RESET}did {dmg_attack} damage to {Bcolors.MONSTER}{enemy.__class__.__name__}. " \
                       f"{enemy.__class__.__name__} {Bcolors.RESET}has {enemy.hp} hp left\n"
         return result
@@ -240,7 +241,7 @@ class Game:
     def play_enemies_turn(self):
         result = f"{Bcolors.MONSTER}\n     -----------------------\n" \
                  "     -    MONSTERS TURN    -\n" \
-                 "     -----------------------\n"
+                 f"     -----------------------\n{Bcolors.RESET}"
         for enemy in self.enemies_list:
             player = random.choice(self.players_list)
             name = player['name']
@@ -329,9 +330,9 @@ class Game:
 
             with open(file, 'w') as f:
                 f.write(json.dumps(game_info))
-            result = "The game has been saved!!\n"
+            result = f"{Bcolors.STAGE}The game has been saved!!\n{Bcolors.RESET}"
         except FileNotFoundError:
-            result = "The file was not found."
+            result = f"{Bcolors.MONSTER}The file was not found."
         return result
 
     def players_names(self):
