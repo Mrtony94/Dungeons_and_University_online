@@ -59,7 +59,6 @@ class Client:
         self.name = name
         self.server_ip = server_ip
         self.server_port = server_port
-        # crear socket y conectarse al servidor
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.server_ip, self.server_port))
         self.end = False

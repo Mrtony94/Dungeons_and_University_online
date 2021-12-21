@@ -56,6 +56,7 @@ class Server(Thread):
     def __init__(self, port):
         Thread.__init__(self)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Reuse socket
         self.socket.bind((Server.IP, port))
         self.socket.listen()
 
