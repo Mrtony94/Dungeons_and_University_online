@@ -179,7 +179,7 @@ There are not GAMES
         self.end = True
 
     def send_your_turn(self, player):
-        message = f"The {game.Bcolors.CHARACTER}{player['character'].name()} ({self.player['name']}):{game.Bcolors.RESET} What are you going to do? >> "
+        message = f"The {game.Bcolors.CHARACTER}{player['character'].name()} ({player['name']}):{game.Bcolors.RESET} What are you going to do? >> "
         options_range = ["a", "s"]
         msg = {'header': protocols.YOUR_TURN, 'message': message, 'options_range': options_range}
         protocols.send_one_msg(player['client_socket'], msg)
@@ -386,5 +386,4 @@ except getopt.GetoptError:
     print("invalid arguments")
 except KeyboardInterrupt:
     print("\nThe server is closing.")
-    sys.exit(0)
 os.kill(pid, signal.SIGTERM)

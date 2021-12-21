@@ -112,7 +112,7 @@ class Client:
     def handle_welcome(self, msg):
         option = Client.get_int_option(msg['menu'], msg['options_range'])
         if option == 3:
-            file_name = input("what's the name of the game: ")
+            file_name = input("What's the name of the game: ")
             self.send_load_game(file_name)
         else:
             self.send_server_option(option)
